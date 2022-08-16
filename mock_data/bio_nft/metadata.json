@@ -1,0 +1,30 @@
+{
+    "image": "IPFS_URL",
+    "name": "BIO Certification #123",
+    "description": "A BIO Certification for La Vigna, first check 01/01/2022",
+    "external_url": "CertificationURL",
+    "attributes": [
+        {
+            "display_type": "First emission",
+            "trait_type": "birthday",
+            "value": 1546360800
+        },
+        {
+            "display_type": "Valid until",
+            "trait_type": "birthday",
+            "value": 1746360800
+        },
+        {
+            "trait_type": "Type",
+            "value": "Certificate pursuant to article 35(1) of regulation (EU) 2018/848 on organic production and labelling of organic products"
+        },
+        {
+            "trait_type": "Name and Address of Operator or group of operators",
+            "value": "La Vigna S.r.l. - Via Roma 23, 65125 PESCARA (PE)"
+        },
+        {
+            "trait_type": "activity",
+            "value": "produzione • production"
+        }
+    ]
+}

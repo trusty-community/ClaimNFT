@@ -14,7 +14,7 @@ task("faucet", "Sends ETH and tokens to an address")
       );
     }
 
-    const addressesFile =
+    /*const addressesFile =
       __dirname + "/../frontend/src/contracts/contract-address.json";
 
     if (!fs.existsSync(addressesFile)) {
@@ -31,10 +31,10 @@ task("faucet", "Sends ETH and tokens to an address")
     }
 
     const token = await ethers.getContractAt("Token", address.Token);
-    const [sender] = await ethers.getSigners();
 
     const tx = await token.transfer(receiver, 100);
-    await tx.wait();
+    await tx.wait();*/
+    const [sender] = await ethers.getSigners();
 
     const tx2 = await sender.sendTransaction({
       to: receiver,

@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
-import ClaimsArtifact from "../contracts/Claims.json";
+import TokenArtifact from "../contracts/Token.json";
 import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
@@ -14,7 +14,7 @@ import contractAddress from "../contracts/contract-address.json";
 import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { Loading } from "./Loading";
-import { Mint } from "./Mint";
+import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
@@ -53,7 +53,6 @@ export class Dapp extends React.Component {
       txBeingSent: undefined,
       transactionError: undefined,
       networkError: undefined,
-      receipt: undefined
     };
 
     this.state = this.initialState;
@@ -75,8 +74,8 @@ export class Dapp extends React.Component {
     // clicks a button. This callback just calls the _connectWallet method.
     if (!this.state.selectedAddress) {
       return (
-        <ConnectWallet
-          connectWallet={() => this._connectWallet()}
+        <ConnectWallet 
+          connectWallet={() => this._connectWallet()} 
           networkError={this.state.networkError}
           dismiss={() => this._dismissNetworkError()}
         />
@@ -89,123 +88,77 @@ export class Dapp extends React.Component {
       return <Loading />;
     }
 
-    if (this.state.tokenData.isCA) {
-      return (
-        <div className="container p-4">
-          <div className="row border">
-            <div className="col-12">
-               {/* 
-                Sending a transaction isn't an immediate action. You have to wait
-                for it to be mined.
-                If we are waiting for one, we show a message here.
-              */}
-              {this.state.txBeingSent && (
-                <WaitingForTransactionMessage txHash={this.state.txBeingSent} />
-              )}
-
-              {/* 
-                Sending a transaction can fail in multiple ways. 
-                If that happened, we show a message here.
-              */}
-              {this.state.transactionError && (
-                <TransactionErrorMessage
-                  message={this._getRpcErrorMessage(this.state.transactionError)}
-                  dismiss={() => this._dismissTransactionError()}
-                />
-              )}
-              <h1>
-                <p>Certification Authority</p>
-              </h1>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-6 border">
-              <h1>
-                <p> Mint</p>
-              </h1>
-              {/*
-                This component displays a form that the user can use to mint a 
-                claim and assign to a company.
-                The component doesn't have logic, it just calls the mintClaim
-                callback.
-              */}
-              {
-                <Mint
-                  mintClaim={(to, metadata_url) =>
-                    this._mintClaim(to, metadata_url)
-                  }
-                />
-              }
-            </div>
-            <div className="col-6 border">
-              <h1>
-                <p> Change Status</p>
-              </h1>
-            </div>
-          </div>
-          {/*
-                This component displays a form that the user can use to mint a 
-                claim and assign to a company.
-                The component doesn't have logic, it just calls the mintClaim
-                callback.
-              */}
-          {this.state.receipt && (
-            <div className="row border">
-              <div className="col-12">
-                <h2>Last Claim Minted:</h2>
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <th scope="row">TokenId</th>
-                      <td>{this.state.receipt.events[0].args[2]._hex}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">To</th>
-                      <td>{this.state.receipt.events[0].args[1]}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>)
-          }
-        </div>
-      );
-    } else {
-      return (
-        <div className="container p-4">
-          <div className="row">
-            <div className="col-12">
-              <h1>
-                {this.state.tokenData.name} ({this.state.tokenData.symbol})
-              </h1>
-              <p>
-                Welcome <b>{this.state.selectedAddress}</b>, you have{" "}
-                <b>
-                  {this.state.balance.toString()} {this.state.tokenData.symbol}
-                </b>
-                .
-              </p>
-            </div>
-          </div>
-
-          <hr />
-
-          <div className="row">
-            <div className="col-12">
-             
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col-12">
-
-            </div>
+    // If everything is loaded, we render the application.
+    return (
+      <div className="container p-4">
+        <div className="row">
+          <div className="col-12">
+            <h1>
+              {this.state.tokenData.name} ({this.state.tokenData.symbol})
+            </h1>
+            <p>
+              Welcome <b>{this.state.selectedAddress}</b>, you have{" "}
+              <b>
+                {this.state.balance.toString()} {this.state.tokenData.symbol}
+              </b>
+              .
+            </p>
           </div>
         </div>
-      );
 
-    }
+        <hr />
 
+        <div className="row">
+          <div className="col-12">
+            {/* 
+              Sending a transaction isn't an immediate action. You have to wait
+              for it to be mined.
+              If we are waiting for one, we show a message here.
+            */}
+            {this.state.txBeingSent && (
+              <WaitingForTransactionMessage txHash={this.state.txBeingSent} />
+            )}
+
+            {/* 
+              Sending a transaction can fail in multiple ways. 
+              If that happened, we show a message here.
+            */}
+            {this.state.transactionError && (
+              <TransactionErrorMessage
+                message={this._getRpcErrorMessage(this.state.transactionError)}
+                dismiss={() => this._dismissTransactionError()}
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-12">
+            {/*
+              If the user has no tokens, we don't show the Transfer form
+            */}
+            {this.state.balance.eq(0) && (
+              <NoTokensMessage selectedAddress={this.state.selectedAddress} />
+            )}
+
+            {/*
+              This component displays a form that the user can use to send a 
+              transaction and transfer some tokens.
+              The component doesn't have logic, it just calls the transferTokens
+              callback.
+            */}
+            {this.state.balance.gt(0) && (
+              <Transfer
+                transferTokens={(to, amount) =>
+                  this._transferTokens(to, amount)
+                }
+                tokenSymbol={this.state.tokenData.symbol}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   componentWillUnmount() {
@@ -241,10 +194,10 @@ export class Dapp extends React.Component {
       if (newAddress === undefined) {
         return this._resetState();
       }
-
+      
       this._initialize(newAddress);
     });
-
+    
     // We reset the dapp state if the network is changed
     window.ethereum.on("chainChanged", ([networkId]) => {
       this._stopPollingData();
@@ -276,9 +229,9 @@ export class Dapp extends React.Component {
 
     // Then, we initialize the contract using that provider and the token's
     // artifact. You can do this same thing with your contracts.
-    this._claim = new ethers.Contract(
-      contractAddress.Claims,
-      ClaimsArtifact.abi,
+    this._token = new ethers.Contract(
+      contractAddress.Token,
+      TokenArtifact.abi,
       this._provider.getSigner(0)
     );
   }
@@ -305,22 +258,21 @@ export class Dapp extends React.Component {
   // The next two methods just read from the contract and store the results
   // in the component state.
   async _getTokenData() {
-    const name = await this._claim.name();
-    const symbol = await this._claim.symbol();
-    const isCA = await this._claim.isCA(this.state.selectedAddress)
+    const name = await this._token.name();
+    const symbol = await this._token.symbol();
 
-    this.setState({ tokenData: { name, symbol, isCA } });
+    this.setState({ tokenData: { name, symbol } });
   }
 
   async _updateBalance() {
-    const balance = await this._claim.balanceOf(this.state.selectedAddress);
-    this.setState({ balance });
+    //const balance = await this._token.balanceOf(this.state.selectedAddress);
+    //this.setState({ balance });
   }
 
   // This method sends an ethereum transaction to transfer tokens.
   // While this action is specific to this application, it illustrates how to
   // send a transaction.
-  async _mintClaim(to, metadata_url) {
+  async _transferTokens(to, amount) {
     // Sending a transaction is a complex operation:
     //   - The user can reject it
     //   - It can fail before reaching the ethereum network (i.e. if the user
@@ -342,8 +294,7 @@ export class Dapp extends React.Component {
 
       // We send the transaction, and save its hash in the Dapp's state. This
       // way we can indicate that we are waiting for it to be mined.
-      const tx = await this._claim.mint(to, metadata_url);
-      console.log("TX ", tx)
+      const tx = await this._token.transfer(to, amount);
       this.setState({ txBeingSent: tx.hash });
 
       // We use .wait() to wait for the transaction to be mined. This method
@@ -355,14 +306,11 @@ export class Dapp extends React.Component {
         // We can't know the exact error that made the transaction fail when it
         // was mined, so we throw this generic one.
         throw new Error("Transaction failed");
-      } else {
-        console.log("Receipt ", receipt)
-        this.setState({ receipt: receipt });
       }
 
       // If we got here, the transaction was successful, so you may want to
       // update your state. Here, we update the user's balance.
-      //await this._updateBalance();
+      await this._updateBalance();
     } catch (error) {
       // We check the error code to see if this error was produced because the
       // user rejected a tx. If that's the case, we do nothing.
@@ -412,7 +360,7 @@ export class Dapp extends React.Component {
       return true;
     }
 
-    this.setState({
+    this.setState({ 
       networkError: 'Please connect Metamask to Localhost:8545'
     });
 
