@@ -122,4 +122,8 @@ contract Claims is Ownable, AccessControl, ERC721Holder, ERC721URIStorage {
     function activateClaim(uint256 tokenId) public onlyRole(AUTHORITY_ROLE) {
         claimStatus[tokenId] = "ACTIVE";
     }
+
+    function isClaimNFT () public returns (bool){
+        return true;
+    }
 }

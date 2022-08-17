@@ -1,8 +1,8 @@
 {
-    "image": "ipfs://bafybeiarujererdtljfwxozkkauuoy3olmijjrvd2bglhzb3j2dvwislyi",
-    "name": "BIO Certification #123",
-    "description": "A BIO Certification for La Vigna, first check 01/01/2022",
-    "external_url": "https://bafkreiggaf3vgm6romo65po5ev23wk2jynifo5ikgj74jwljrr5strqd3a.ipfs.nftstorage.link/",
+    "image": "ipfs://bafybeiguelsijddmpeqguu77xrssxtmkvzmdk2nd4m5q2qh7peovooubvq",
+    "name": "IGP Certification #1234",
+    "description": "IGP Certification for LIMONE, first check 01/01/2022",
+    "external_url": "https://bafkreiabebv7ga4ou67na4wqy52nuci2citcshky77z6remc4vk45nmgc4.ipfs.nftstorage.link/",
     "attributes": [
         {
             "display_type": "First emission",
@@ -16,11 +16,11 @@
         },
         {
             "trait_type": "Type",
-            "value": "Certificate pursuant to article 35(1) of regulation (EU) 2018/848 on organic production and labelling of organic products"
+            "value": "IGP"
         },
         {
             "trait_type": "Name and Address of Operator or group of operators",
-            "value": "La Vigna S.r.l. - Via Roma 23, 65125 PESCARA (PE)"
+            "value": "Lemon S.r.l. - Via Roma 23, 95019 Zafferana Etnea (CT)"
         },
         {
             "trait_type": "activity",

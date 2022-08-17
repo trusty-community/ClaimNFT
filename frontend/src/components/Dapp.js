@@ -94,7 +94,7 @@ export class Dapp extends React.Component {
         <div className="container p-4">
           <div className="row border">
             <div className="col-12">
-               {/* 
+              {/* 
                 Sending a transaction isn't an immediate action. You have to wait
                 for it to be mined.
                 If we are waiting for one, we show a message here.
@@ -173,7 +173,7 @@ export class Dapp extends React.Component {
     } else {
       return (
         <div className="container p-4">
-          <div className="row">
+          <div className="row border">
             <div className="col-12">
               <h1>
                 {this.state.tokenData.name} ({this.state.tokenData.symbol})
@@ -187,18 +187,25 @@ export class Dapp extends React.Component {
               </p>
             </div>
           </div>
-
-          <hr />
-
-          <div className="row">
+          <div className="row border">
             <div className="col-12">
-             
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col-12">
-
+              <h1>
+                Check Status
+              </h1>
+              {/*
+                This component displays a form that the user can use to mint a 
+                claim and assign to a company.
+                The component doesn't have logic, it just calls the mintClaim
+                callback.
+              */}
+              {
+                <checkStatus
+                  checkStatus={(tokenId) =>
+                    this._checkStatus(tokenId)
+                  }
+                />
+              }
+              
             </div>
           </div>
         </div>
