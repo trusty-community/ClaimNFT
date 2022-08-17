@@ -65,6 +65,8 @@ contract Claims is Ownable, AccessControl, ERC721Holder, ERC721URIStorage {
     */
     constructor() ERC721("Claims", "CLAIM") {
         _setupRole(AUTHORITY_ROLE, msg.sender);
+        mint(msg.sender, "");
+        claimStatus[1] = "NOT DEFINED";
     }
 
     modifier onlyCA() {
@@ -109,21 +111,26 @@ contract Claims is Ownable, AccessControl, ERC721Holder, ERC721URIStorage {
         claimStatus[newItemId] = "ACTIVE";
     }
 
-    function revokeClaim(uint256 tokenId, string memory message) public onlyRole(AUTHORITY_ROLE) {
+    function revokeClaim(uint256 tokenId)
+        public
+        onlyRole(AUTHORITY_ROLE)
+    {
         claimStatus[tokenId] = "REVOKED";
-        _burn(tokenId);
     }
 
     function suspendClaim(uint256 tokenId) public onlyRole(AUTHORITY_ROLE) {
         claimStatus[tokenId] = "SUSPENDED";
-
     }
 
     function activateClaim(uint256 tokenId) public onlyRole(AUTHORITY_ROLE) {
         claimStatus[tokenId] = "ACTIVE";
     }
 
-    function isClaimNFT () public returns (bool){
+    function isClaimNFT() public returns (bool) {
         return true;
+    }
+
+    function checkStatus(uint tokenId) public view returns (string memory) {
+        return claimStatus[tokenId];
     }
 }

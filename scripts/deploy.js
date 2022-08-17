@@ -18,11 +18,17 @@ async function main() {
 
   // ethers is available in the global scope
   const pKey = process.env.PRIVATE_KEY;
+  let deployer = {}
+  if (pKey) {
+    let provider = new ethers.providers.JsonRpcProvider();
+    console.log("PRIVATE KEY ", pKey);
+    deployer = await new ethers.Wallet(pKey, provider);
+  } else {
+    [deployer] = await ethers.getSigners();
+  }
   // Connect a wallet
-  let provider = new ethers.providers.JsonRpcProvider();
-  console.log("PRIVATE KEY ", pKey);
-  const deployer = await new ethers.Wallet(pKey,provider);
-  //const [deployer] = await ethers.getSigners();
+
+  //const 
   console.log(
     "Deploying the contracts with the account:",
     await deployer.getAddress()
@@ -30,7 +36,7 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const Claims = await ethers.getContractFactory("Claims",deployer);
+  const Claims = await ethers.getContractFactory("Claims", deployer);
   const claims = await Claims.deploy();
   await claims.deployed();
 

@@ -18,6 +18,8 @@ import { Mint } from "./Mint";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
+import { CheckClaim } from "./checkClaim";
+import { ChangeStatus } from "./changeStatus";
 
 // This is the Hardhat Network id that we set in our hardhat.config.js.
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
@@ -53,7 +55,8 @@ export class Dapp extends React.Component {
       txBeingSent: undefined,
       transactionError: undefined,
       networkError: undefined,
-      receipt: undefined
+      receipt: undefined,
+      checkedClaim: undefined,
     };
 
     this.state = this.initialState;
@@ -119,7 +122,7 @@ export class Dapp extends React.Component {
             </div>
           </div>
           <div className="row">
-            <div className="col-6 border">
+            <div className="col-4 border">
               <h1>
                 <p> Mint</p>
               </h1>
@@ -137,10 +140,40 @@ export class Dapp extends React.Component {
                 />
               }
             </div>
-            <div className="col-6 border">
+            <div className="col-4 border">
               <h1>
                 <p> Change Status</p>
               </h1>
+              {/*
+                This component displays a form that the user can use to change the claim status .
+                The component doesn't have logic, it just calls the changeStatus
+                callback.
+              */}
+              {
+                <ChangeStatus
+                  changeStatus={(tokenId, newStatus) =>
+                    this._changeStatus(tokenId, newStatus)
+                  }
+                />
+              }
+            </div>
+            <div className="col-4 border">
+              <h1>
+                <p> Check Claim</p>
+              </h1>
+              {/*
+                This component displays a form that the user can use to mint a 
+                claim and assign to a company.
+                The component doesn't have logic, it just calls the mintClaim
+                callback.
+              */}
+              {
+                <CheckClaim
+                  checkClaim={(tokenId) =>
+                    this._checkClaim(tokenId)
+                  }
+                />
+              }
             </div>
           </div>
           {/*
@@ -168,6 +201,41 @@ export class Dapp extends React.Component {
               </div>
             </div>)
           }
+          {/*
+                This component displays a form that the user can use to mint a 
+                claim and assign to a company.
+                The component doesn't have logic, it just calls the mintClaim
+                callback.
+              */}
+          {this.state.checkedClaim && (
+            <div className="row border">
+              <div className="col-12">
+                <h2>Claim Checked:</h2>
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <th scope="row">TokenId</th>
+                      <td>{this.state.checkedClaim.tokenId}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Owner</th>
+                      <td>{this.state.checkedClaim.ownerOf}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Status</th>
+                      <td>{this.state.checkedClaim.status}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Uri</th>
+                      <td>{this.state.checkedClaim.uri}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>)
+          }
+
+
         </div>
       );
     } else {
@@ -190,7 +258,7 @@ export class Dapp extends React.Component {
           <div className="row border">
             <div className="col-12">
               <h1>
-                Check Status
+                Check Claim
               </h1>
               {/*
                 This component displays a form that the user can use to mint a 
@@ -199,15 +267,48 @@ export class Dapp extends React.Component {
                 callback.
               */}
               {
-                <checkStatus
-                  checkStatus={(tokenId) =>
-                    this._checkStatus(tokenId)
+                <CheckClaim
+                  checkClaim={(tokenId) =>
+                    this._checkClaim(tokenId)
                   }
                 />
               }
-              
+
             </div>
           </div>
+          {/*
+                This component displays a form that the user can use to mint a 
+                claim and assign to a company.
+                The component doesn't have logic, it just calls the mintClaim
+                callback.
+              */}
+          {this.state.checkedClaim && (
+            <div className="row border">
+              <div className="col-12">
+                <h2>Claim Checked:</h2>
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <th scope="row">TokenId</th>
+                      <td>{this.state.checkedClaim.tokenId}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Owner</th>
+                      <td>{this.state.checkedClaim.ownerOf}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Status</th>
+                      <td>{this.state.checkedClaim.status}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Uri</th>
+                      <td>{this.state.checkedClaim.uri}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>)
+          }
         </div>
       );
 
@@ -323,6 +424,90 @@ export class Dapp extends React.Component {
     const balance = await this._claim.balanceOf(this.state.selectedAddress);
     this.setState({ balance });
   }
+
+  async _checkClaim(tokenId) {
+    try {
+      const status = await this._claim.checkStatus(tokenId);
+      console.log(status);
+      let uri = ""
+      let ownerOf = ""
+      if (status === "NOT DEFINED") {
+        uri = "NOT DEFINED"
+        ownerOf = "NOT DEFINED"
+      } else {
+        uri = await this._claim.tokenURI(tokenId)
+        ownerOf = await this._claim.ownerOf(tokenId)
+      }
+      this.setState({ checkedClaim: { tokenId, ownerOf, status, uri } });
+
+    } catch (error) {
+      console.log("TokenId inesistente")
+      const status = "NOT DEFINED";
+      const uri = "NOT DEFINED"
+      const ownerOf = "NOT DEFINED"
+      this.setState({ checkedClaim: { tokenId, ownerOf, status, uri } });
+
+    }
+
+    //this.setState({ balance });
+  }
+
+  async _changeStatus(tokenId, newStatus) {
+    try {
+      // If a transaction fails, we save that error in the component's state.
+      // We only save one such error, so before sending a second transaction, we
+      // clear it.
+      this._dismissTransactionError();
+
+      // We send the transaction, and save its hash in the Dapp's state. This
+      // way we can indicate that we are waiting for it to be mined.
+      let tx = {}
+      if (newStatus === "ACTIVE") {
+        tx = await this._claim.activateClaim(tokenId);
+      } else if (newStatus === "SUSPEND") {
+        tx = await this._claim.suspendClaim(tokenId);
+      } else if (newStatus === "REVOKE") {
+        tx = await this._claim.revokeClaim(tokenId);
+      }
+      console.log("TX ", tx)
+      this.setState({ txBeingSent: tx.hash });
+
+      // We use .wait() to wait for the transaction to be mined. This method
+      // returns the transaction's receipt.
+      const receipt = await tx.wait();
+
+      // The receipt, contains a status flag, which is 0 to indicate an error.
+      if (receipt.status === 0) {
+        // We can't know the exact error that made the transaction fail when it
+        // was mined, so we throw this generic one.
+        throw new Error("Transaction failed");
+      } else {
+        console.log("Receipt ", receipt)
+        //this.setState({ receipt: receipt });
+      }
+
+      // If we got here, the transaction was successful, so you may want to
+      // update your state. Here, we update the user's balance.
+      //await this._updateBalance();
+    } catch (error) {
+      // We check the error code to see if this error was produced because the
+      // user rejected a tx. If that's the case, we do nothing.
+      if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+        return;
+      }
+
+      // Other errors are logged and stored in the Dapp's state. This is used to
+      // show them to the user, and for debugging.
+      console.error(error);
+      this.setState({ transactionError: error });
+    } finally {
+      // If we leave the try/catch, we aren't sending a tx anymore, so we clear
+      // this part of the state.
+      this.setState({ txBeingSent: undefined });
+    }
+  }
+
+
 
   // This method sends an ethereum transaction to transfer tokens.
   // While this action is specific to this application, it illustrates how to
