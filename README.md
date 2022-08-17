@@ -1,4 +1,4 @@
-# Hardhat Boilerplate
+# ClaimNFT Starter Kit
 
 This repository contains a sample project that you can use as the starting point
 for your ClaimNFT project.
