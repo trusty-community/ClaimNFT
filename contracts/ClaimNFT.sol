@@ -16,12 +16,18 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 // This is the main building block for smart contracts.
-contract Claims is Ownable, AccessControl, ERC721Holder, ERC721URIStorage {
+contract Claims is ERC721URIStorage, Ownable, AccessControl {
     // Create a new role identifier for the minter role
     bytes32 public constant AUTHORITY_ROLE = keccak256("AUTHORITY_ROLE");
     mapping(uint256 => string) public claimStatus;
     using Counters for Counters.Counter;
     Counters.Counter private supply;
+    //Declare an Event
+    event UpdatedStatus(
+        uint256 indexed tokenId,
+        string newStatus,
+        string tokenURI
+    );
 
     //I need to insert this to inherit ERC1155 and ERC1155Holder at the same time
     function supportsInterface(bytes4 interfaceId)
@@ -38,35 +44,11 @@ contract Claims is Ownable, AccessControl, ERC721Holder, ERC721URIStorage {
     bytes4 private constant _InterfaceId_ERC721Metadata = 0x5b5e139f;
     bytes4 private constant _InterfaceId_ERC721 = 0x80ac58cd;
     */
-    /*
-      Claims metadata format
-      {
-          "title": "Project Proof Badge Metadata",
-          "type": "object",
-          "properties": {
-              "name": {
-                  "type": "string",
-                  "description": "Identifies the badge template to which this NFT represents",
-              },
-              "description": {
-                  "type": "string",
-                  "description": "Describes the asset to which this NFT represents",
-              },
-              "image": {
-                  "type": "string",
-                  "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.",
-              },
-              "unit_id": {
-                  "type": "integer",
-                  "description": "Specifies the id of this unit within its kind",
-              }
-          }
-      }
-    */
-    constructor() ERC721("Claims", "CLAIM") {
+   
+    constructor() ERC721("ClaimNFT", "CLAIM") {
         _setupRole(AUTHORITY_ROLE, msg.sender);
-        mint(msg.sender, "");
-        claimStatus[1] = "NOT DEFINED";
+        //mint(msg.sender, "");
+        //claimStatus[1] = "NOT DEFINED";
     }
 
     modifier onlyCA() {
@@ -111,26 +93,26 @@ contract Claims is Ownable, AccessControl, ERC721Holder, ERC721URIStorage {
         claimStatus[newItemId] = "ACTIVE";
     }
 
-    function revokeClaim(uint256 tokenId)
-        public
-        onlyRole(AUTHORITY_ROLE)
-    {
+    function revokeClaim(uint256 tokenId) public onlyRole(AUTHORITY_ROLE) {
         claimStatus[tokenId] = "REVOKED";
+        emit UpdatedStatus(tokenId, "REVOKED", tokenURI(tokenId));
     }
 
     function suspendClaim(uint256 tokenId) public onlyRole(AUTHORITY_ROLE) {
         claimStatus[tokenId] = "SUSPENDED";
+        emit UpdatedStatus(tokenId, "SUSPENDED", tokenURI(tokenId));
     }
 
     function activateClaim(uint256 tokenId) public onlyRole(AUTHORITY_ROLE) {
         claimStatus[tokenId] = "ACTIVE";
+        emit UpdatedStatus(tokenId, "ACTIVE", tokenURI(tokenId));
     }
 
     function isClaimNFT() public returns (bool) {
         return true;
     }
 
-    function checkStatus(uint tokenId) public view returns (string memory) {
+    function checkStatus(uint256 tokenId) public view returns (string memory) {
         return claimStatus[tokenId];
     }
 }

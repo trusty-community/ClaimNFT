@@ -5,13 +5,13 @@
     "external_url": "https://bafkreiabebv7ga4ou67na4wqy52nuci2citcshky77z6remc4vk45nmgc4.ipfs.nftstorage.link/",
     "attributes": [
         {
-            "display_type": "First emission",
-            "trait_type": "birthday",
+            "display_type": "date",
+            "trait_type": "First emission",
             "value": 1546360800
         },
         {
-            "display_type": "Valid until",
-            "trait_type": "birthday",
+            "display_type": "date",
+            "trait_type": "Valid Until",
             "value": 1746360800
         },
         {
@@ -25,6 +25,6 @@
         {
             "trait_type": "activity",
             "value": "produzione • production"
-        },
+        }
     ]
 }
