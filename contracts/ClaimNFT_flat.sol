@@ -566,36 +566,6 @@ interface IERC721Receiver {
     ) external returns (bytes4);
 }
 
-// File: @openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol
-
-
-// OpenZeppelin Contracts v4.4.1 (token/ERC721/utils/ERC721Holder.sol)
-
-pragma solidity ^0.8.0;
-
-
-/**
- * @dev Implementation of the {IERC721Receiver} interface.
- *
- * Accepts all token transfers.
- * Make sure the contract is able to use its token with {IERC721-safeTransferFrom}, {IERC721-approve} or {IERC721-setApprovalForAll}.
- */
-contract ERC721Holder is IERC721Receiver {
-    /**
-     * @dev See {IERC721Receiver-onERC721Received}.
-     *
-     * Always returns `IERC721Receiver.onERC721Received.selector`.
-     */
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes memory
-    ) public virtual override returns (bytes4) {
-        return this.onERC721Received.selector;
-    }
-}
-
 // File: @openzeppelin/contracts/utils/introspection/IERC165.sol
 
 
@@ -1581,34 +1551,6 @@ abstract contract ERC721URIStorage is ERC721 {
         if (bytes(_tokenURIs[tokenId]).length != 0) {
             delete _tokenURIs[tokenId];
         }
-    }
-}
-
-// File: @openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol
-
-
-// OpenZeppelin Contracts (last updated v4.7.0) (token/ERC721/extensions/ERC721Burnable.sol)
-
-pragma solidity ^0.8.0;
-
-
-
-/**
- * @title ERC721 Burnable Token
- * @dev ERC721 Token that can be burned (destroyed).
- */
-abstract contract ERC721Burnable is Context, ERC721 {
-    /**
-     * @dev Burns `tokenId`. See {ERC721-_burn}.
-     *
-     * Requirements:
-     *
-     * - The caller must own `tokenId` or be an approved operator.
-     */
-    function burn(uint256 tokenId) public virtual {
-        //solhint-disable-next-line max-line-length
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner nor approved");
-        _burn(tokenId);
     }
 }
 
@@ -3156,9 +3098,6 @@ library console {
 pragma solidity ^0.8.9;
 
 // We import this library to be able to use console.log
-
-
-
 
 
 
